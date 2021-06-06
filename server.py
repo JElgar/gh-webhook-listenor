@@ -32,20 +32,22 @@ def get_hook(event: str) -> Optional[str]:
 
 def run_hook(event: str) -> Tuple[str, str]:
     script = get_hook(event)
-    if script:
-        proc = Popen([script], stdout=PIPE, stderr=PIPE)
-        out, err = proc.communicate()
-        out = out.decode("utf-8")
-        err = err.decode("utf-8")
 
-        if proc.returncode != 0:
-            logging.error("[%s]: %d\n%s", script, proc.returncode, err)
-        else:
-            logging.info("[%s]: %d\n%s", script, proc.returncode, out)
+    if not script:
+        logging.error("Failed to find script for {event}")
+        return None, None
 
-        return out, err
+    proc = Popen([script], stdout=PIPE, stderr=PIPE)
+    out, err = proc.communicate()
+    out = out.decode("utf-8")
+    err = err.decode("utf-8")
+
+    if proc.returncode != 0:
+        logging.error("[%s]: %d\n%s", script, proc.returncode, err)
     else:
-        logging.error("Failed to find script")
+        logging.info("[%s]: %d\n%s", script, proc.returncode, out)
+
+    return out, err
 
 
 @app.route("/", methods=["POST"])
@@ -96,8 +98,8 @@ def gh_webhooks():
     if event == "ping":
         return json.dumps({"msg": "pong"})
 
-    else:
-        run_hook(event)
+    out, err = run_hook(event)
+    return json.dumps({"out": out, "err": err})
 
 
 if __name__ == "__main__":
