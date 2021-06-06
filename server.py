@@ -48,7 +48,7 @@ def run_hook(event: str) -> Tuple[str, str]:
         logging.error("Failed to find script")
 
 
-@app.route("/")
+@app.route("/", methods=["POST"])
 def gh_webhooks():
 
     # == Verify secret == #
