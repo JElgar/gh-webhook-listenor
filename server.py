@@ -14,11 +14,7 @@ webhook_secret = getenv("GH_WEBHOOK_SECRET")
 logging.basicConfig(stream=stderr, level=logging.INFO)
 
 hooks_dir = getenv("WEBHOOK_HOOKS_DIR", "/app/hooks")
-print([join(hooks_dir, file) for file in sorted(listdir(hooks_dir))])
-scripts = [
-    join(hooks_dir, file) for file in sorted(listdir(hooks_dir)) if access(file, X_OK)
-]
-print("HELLO")
+scripts = [join(hooks_dir, file) for file in sorted(listdir(hooks_dir))]
 if not scripts:
     logging.error(
         "No executable hook scripts found; did you forget to"
@@ -27,13 +23,11 @@ if not scripts:
     )
     exit(1)
 
-print(scripts)
-for script in scripts:
-    print(script)
-
 
 def get_hook(event: str) -> Optional[str]:
-    return next((script for script in scripts if script == f"{event}.sh"), None)
+    return next(
+        (script for script in scripts if script == f"{hooks_dir}/{event}.sh"), None
+    )
 
 
 def run_hook(event: str) -> Tuple[str, str]:
@@ -106,12 +100,10 @@ def gh_webhooks():
         run_hook(event)
 
 
-@app.route("/test")
-def test_gh_puslihs():
-    out, err = run_hook("publish")
-    return json.dumps({"msg": out})
-
-
 if __name__ == "__main__":
-    logging.info("All systems operational, beginning application loop")
-    app.run(debug=False, host="0.0.0.0", port=8000)
+    host_url = getenv("HOST_URL", "0.0.0.0")
+    host_port = getenv("HOST_PORT", 8000)
+    logging.info(
+        f"All systems operational, beginning application loop. Host: {host_url}, Port: {host_port}"
+    )
+    app.run(debug=False, host=host_url, port=host_port)
