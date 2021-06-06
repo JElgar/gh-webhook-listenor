@@ -2,6 +2,7 @@ FROM python:3.9-alpine
 
 # Get bash
 RUN apk add --no-cache bash
+RUN pip install docker-compose
 
 WORKDIR /app
 
