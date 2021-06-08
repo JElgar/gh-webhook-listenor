@@ -1,7 +1,8 @@
-FROM docker:20.10
+FROM docker:20.10-dind
 
 # Get requirements
-RUN apk add --no-cache python3 openssl-dev libffi-dev make git build-base python3-dev py3-pip bash
+RUN apk add --no-cache python3 openssl-dev libffi-dev make git build-base python3-dev py3-pip libgcc bash curl make cargo gcc libc-dev rust
+RUN pip3 install docker-compose
 
 WORKDIR /app
 
