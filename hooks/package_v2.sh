@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo "Hello world"
+docker-compose pull
+docker-compose up -d
